@@ -7,7 +7,7 @@ license = "MIT OR Apache-2.0"
 description = "Demo applications showcasing FMOD audio integration in Bevy game engine using bevy_fmod"
 
 [dependencies]
-bevy_fmod = { path = "../bevy_fmod" }
+bevy_fmod = { git = "https://github.com/chainhackers/bevy_fmod.git" }
 bevy = { version = "0.16", features = ["default"] }
 
 [[bin]]
