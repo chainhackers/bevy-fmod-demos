@@ -11,9 +11,13 @@ The easiest way to run demos is using the provided helper scripts:
 ./setup_demos.sh
 
 # Run demos
-./run_demos.sh verify_fmod    # Verify FMOD installation
-./run_demos.sh minimal         # Run minimal demo
-./run_demos.sh spatial         # Run spatial audio demo
+./run_demos.sh verify_fmod         # Verify FMOD installation
+./run_demos.sh minimal             # Basic sound playback
+./run_demos.sh spatial             # 3D positioned audio
+./run_demos.sh parameters          # Multi-track ambience
+./run_demos.sh audio_control       # Audio playback controls
+./run_demos.sh simple_sound_test   # Non-interactive test
+./run_demos.sh manual_sound_test   # Interactive keyboard test
 ```
 
 The `run_demos.sh` script automatically verifies FMOD libraries before running demos.
@@ -40,12 +44,12 @@ parent/
 ## Available Demos
 
 - **verify_fmod** - Verify FMOD library installation and version
-- **minimal** - Basic sound playback
-- **spatial** - 3D positioned audio with arrow key controls
-- **parameters** - Event parameter control
-- **audio_control** - Audio control demonstration
-- **simple_sound_test** - Non-interactive playback test (auto-exits after 3s)
-- **manual_sound_test** - Interactive keyboard test (SPACE, 1-2, ESC keys)
+- **minimal** - Plays background music in a loop (grey window with status text)
+- **spatial** - 3D audio positioning - cube orbits around player, move with arrow keys to hear volume/pan changes
+- **parameters** - Multi-track ambience - plays Forest and Country ambience sounds simultaneously
+- **audio_control** - Audio playback controls - Stop/Play/Toggle music with S/P/T keys
+- **simple_sound_test** - Non-interactive test - plays two sounds and exits after 3 seconds
+- **manual_sound_test** - Interactive keyboard test - play different sounds with SPACE/1/2 keys, ESC to exit
 
 ## Manual Setup
 
@@ -67,17 +71,36 @@ cargo run --bin spatial
 
 ## Bank Files
 
-Demo bank files are included in this repository (`assets/audio/demo_project/Build/Desktop/`). These banks must contain specific events from FMOD Studio's Getting Started example project:
-- `event:/Music/Level 03` (used by minimal demo)
-- Other events as required by each demo
+Demos use bank files from two locations:
 
-**If demos hang or fail:**
-The included bank files may not match the expected events. To rebuild with correct events:
+### Music Demos (use repository banks)
+These demos use banks from `assets/audio/demo_project/Build/Desktop/`:
+- **minimal** - Uses Music.bank (event:/Music/Level 03)
+- **spatial** - Uses Music.bank for 3D positioning
+- **audio_control** - Uses Music.bank for playback control
 
-1. Download FMOD Studio from [fmod.com](https://www.fmod.com/download) (free account required)
-2. Open the Getting Started example: `Help > Getting Started` or `File > Open > ~/.fmod/FMOD Studio/Examples/GettingStarted.fspro`
-3. Build banks: `File > Build`
-4. Copy to repository: `cp -r ~/.fmod/FMOD\ Studio/Examples/Build/Desktop/* assets/audio/demo_project/Build/Desktop/`
+The repository includes:
+- Master.bank
+- Master.strings.bank
+- Music.bank
+
+### SFX Demos (use FMOD SDK example banks)
+These demos use banks from FMOD SDK at `fmod/api/studio/examples/media/` (accessed via symlink):
+- **parameters** - Uses SFX.bank (event:/Ambience/Forest, event:/Ambience/Country)
+- **simple_sound_test** - Uses SFX.bank (event:/UI/Cancel, event:/Weapons/Explosion)
+- **manual_sound_test** - Uses SFX.bank and Music.bank
+
+The FMOD SDK (downloaded during setup) includes all required banks:
+- Master.bank, Master.strings.bank
+- SFX.bank (21MB - contains ambience, weapons, UI sounds)
+- Music.bank, Dialogue_*.bank, Vehicles.bank, VO.bank
+
+**If music demos fail:**
+Rebuild the banks from FMOD Studio Getting Started example:
+1. Download FMOD Studio from [fmod.com](https://www.fmod.com/download)
+2. Open: `Help > Getting Started` or `~/.fmod/FMOD Studio/Examples/GettingStarted.fspro`
+3. Build: `File > Build`
+4. Copy: `cp -r ~/.fmod/FMOD\ Studio/Examples/Build/Desktop/* assets/audio/demo_project/Build/Desktop/`
 
 ## Troubleshooting
 

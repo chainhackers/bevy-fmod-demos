@@ -14,7 +14,10 @@ fn main() -> Result<(), bevy_fmod::libfmod::Error> {
     let minor = (version >> 8) & 0xFF;
     let patch = version & 0xFF;
 
-    println!("✅ FMOD Version: {}.{:02}.{:02} (build {})", major, minor, patch, build);
+    println!(
+        "✅ FMOD Version: {}.{:02}.{:02} (build {})",
+        major, minor, patch, build
+    );
 
     // Initialize (may fail in headless environments)
     match system.init(512, Init::NORMAL, None) {

@@ -10,6 +10,9 @@ use bevy::prelude::*;
 use bevy_fmod::prelude::{AudioSource, FmodPlugin, FmodStudio, StopMode};
 
 fn main() {
+    println!("\n🎵 FMOD Manual Sound Test");
+    println!("=========================\n");
+
     App::new()
         .add_plugins((
             DefaultPlugins,
@@ -55,7 +58,7 @@ fn setup(mut commands: Commands) {
             1: Play explosion\n\
             2: Play UI cancel sound\n\
             ESC: Exit\n\n\
-            Status: Ready"
+            Status: Ready",
         ),
         TextFont {
             font_size: 18.0,
@@ -70,39 +73,47 @@ fn setup(mut commands: Commands) {
     ));
 }
 
-fn setup_sounds(
-    mut commands: Commands,
-    studio: Res<FmodStudio>,
-) {
+fn setup_sounds(mut commands: Commands, studio: Res<FmodStudio>) {
+    // Display FMOD version
+    if let Ok(core) = studio.get_core_system() {
+        if let Ok((version, build)) = core.get_version() {
+            let major = (version >> 16) & 0xFF;
+            let minor = (version >> 8) & 0xFF;
+            let patch = version & 0xFF;
+            println!(
+                "✅ FMOD {}.{:02}.{:02} (build {})",
+                major, minor, patch, build
+            );
+        }
+    }
+
     println!("Setting up FMOD events...");
 
     // Setup ambience sound (looping)
     match studio.get_event("event:/Ambience/Country") {
-        Ok(event_desc) => {
-            match event_desc.create_instance() {
-                Ok(instance) => {
-                    println!("✓ Created Country ambience instance");
-                    commands.spawn((
-                        AmbienceSound,
-                        AudioSource {
-                            event_instance: instance,
-                            despawn_stop_mode: StopMode::AllowFadeout,
-                        },
-                    ));
-                }
-                Err(e) => println!("✗ Failed to create ambience instance: {:?}", e),
+        Ok(event_desc) => match event_desc.create_instance() {
+            Ok(instance) => {
+                println!("✅ Created Country ambience instance");
+                commands.spawn((
+                    AmbienceSound,
+                    AudioSource {
+                        event_instance: instance,
+                        despawn_stop_mode: StopMode::AllowFadeout,
+                    },
+                ));
             }
-        }
-        Err(e) => println!("✗ Failed to get Ambience/Country event: {:?}", e),
+            Err(e) => println!("❌ Failed to create ambience instance: {:?}", e),
+        },
+        Err(e) => println!("❌ Failed to get Ambience/Country event: {:?}", e),
     }
 
-    println!("Sound setup complete\n");
+    println!("✅ Sound setup complete\n");
 }
 
 fn handle_input(
     keyboard: Res<ButtonInput<KeyCode>>,
     mut sound_state: ResMut<SoundState>,
-    ambience_query: Query<&AudioSource, With<AmbienceSound>>,
+    ambience: Single<&AudioSource, With<AmbienceSound>>,
     mut commands: Commands,
     studio: Res<FmodStudio>,
     mut exit: EventWriter<AppExit>,
@@ -112,30 +123,28 @@ fn handle_input(
 
     // Toggle ambience with SPACE
     if keyboard.just_pressed(KeyCode::Space) {
-        if let Ok(ambience) = ambience_query.get_single() {
-            if !sound_state.ambience_playing {
-                match ambience.start() {
-                    Ok(_) => {
-                        println!("🎵 Started Country ambience");
-                        sound_state.ambience_playing = true;
-                        status.push_str("Playing ambience");
-                    }
-                    Err(e) => {
-                        println!("✗ Failed to start ambience: {:?}", e);
-                        status.push_str("Failed to start ambience");
-                    }
+        if !sound_state.ambience_playing {
+            match ambience.start() {
+                Ok(_) => {
+                    println!("🎵 Started Country ambience");
+                    sound_state.ambience_playing = true;
+                    status.push_str("Playing ambience");
                 }
-            } else {
-                match ambience.stop(StopMode::AllowFadeout) {
-                    Ok(_) => {
-                        println!("⏹ Stopped Country ambience");
-                        sound_state.ambience_playing = false;
-                        status.push_str("Stopped ambience");
-                    }
-                    Err(e) => {
-                        println!("✗ Failed to stop ambience: {:?}", e);
-                        status.push_str("Failed to stop ambience");
-                    }
+                Err(e) => {
+                    println!("❌ Failed to start ambience: {:?}", e);
+                    status.push_str("Failed to start ambience");
+                }
+            }
+        } else {
+            match ambience.stop(StopMode::AllowFadeout) {
+                Ok(_) => {
+                    println!("⏹ Stopped Country ambience");
+                    sound_state.ambience_playing = false;
+                    status.push_str("Stopped ambience");
+                }
+                Err(e) => {
+                    println!("❌ Failed to stop ambience: {:?}", e);
+                    status.push_str("Failed to stop ambience");
                 }
             }
         }
@@ -154,13 +163,13 @@ fn handle_input(
                         status.push_str("Played explosion");
                     }
                     Err(e) => {
-                        println!("✗ Failed to create explosion instance: {:?}", e);
+                        println!("❌ Failed to create explosion instance: {:?}", e);
                         status.push_str("Failed to create explosion");
                     }
                 }
             }
             Err(e) => {
-                println!("✗ Failed to get explosion event: {:?}", e);
+                println!("❌ Failed to get explosion event: {:?}", e);
                 status.push_str("Explosion event not found");
             }
         }
@@ -179,13 +188,13 @@ fn handle_input(
                         status.push_str("Played UI cancel");
                     }
                     Err(e) => {
-                        println!("✗ Failed to create UI instance: {:?}", e);
+                        println!("❌ Failed to create UI instance: {:?}", e);
                         status.push_str("Failed to create UI sound");
                     }
                 }
             }
             Err(e) => {
-                println!("✗ Failed to get UI/Cancel event: {:?}", e);
+                println!("❌ Failed to get UI/Cancel event: {:?}", e);
                 status.push_str("UI event not found");
             }
         }
