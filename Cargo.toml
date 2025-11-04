@@ -8,7 +8,7 @@ description = "Demo applications showcasing FMOD audio integration in Bevy game 
 
 [dependencies]
 bevy_fmod = { git = "https://github.com/chainhackers/bevy_fmod.git" }
-bevy = { version = "0.16", features = ["default"] }
+bevy = { version = "0.17", features = ["default"] }
 
 [[bin]]
 name = "minimal"
