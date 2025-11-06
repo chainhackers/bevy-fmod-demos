@@ -32,12 +32,6 @@ fn main() {
 #[derive(Component)]
 struct AmbienceSound;
 
-#[derive(Component)]
-struct ExplosionSound;
-
-#[derive(Component)]
-struct UISound;
-
 #[derive(Resource)]
 struct SoundState {
     ambience_playing: bool,
@@ -114,9 +108,8 @@ fn handle_input(
     keyboard: Res<ButtonInput<KeyCode>>,
     mut sound_state: ResMut<SoundState>,
     ambience: Single<&AudioSource, With<AmbienceSound>>,
-    mut commands: Commands,
     studio: Res<FmodStudio>,
-    mut exit: EventWriter<AppExit>,
+    mut exit: MessageWriter<AppExit>,
     mut text_query: Query<&mut Text>,
 ) {
     let mut status = String::from("Status: ");
@@ -213,7 +206,7 @@ fn handle_input(
             let current = text.as_str();
             let lines = current.split('\n').collect::<Vec<_>>();
             let mut new_text = lines[..lines.len() - 1].join("\n");
-            new_text.push_str("\n");
+            new_text.push('\n');
             new_text.push_str(&status);
             *text = Text::new(new_text);
         }

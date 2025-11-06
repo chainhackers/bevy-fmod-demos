@@ -2,7 +2,7 @@
 //! This verifies that FMOD 2.03.09 can actually play audio through the sound device
 
 use bevy::prelude::*;
-use bevy_fmod::prelude::{AudioSource, FmodPlugin, FmodStudio, StopMode};
+use bevy_fmod::prelude::{FmodPlugin, FmodStudio};
 use std::time::Duration;
 
 fn main() {
@@ -94,10 +94,14 @@ fn play_test_sound(mut commands: Commands, studio: Res<FmodStudio>) {
     println!("\nWaiting 3 seconds for sounds to finish...");
 }
 
-fn check_completion(time: Res<Time>, mut timer: ResMut<TestTimer>, mut exit: EventWriter<AppExit>) {
+fn check_completion(
+    time: Res<Time>,
+    mut timer: ResMut<TestTimer>,
+    mut exit: MessageWriter<AppExit>,
+) {
     timer.timer.tick(time.delta());
 
-    if timer.timer.finished() {
+    if timer.timer.is_finished() {
         println!("\n✅ Test completed");
         println!("If you heard sound effects, FMOD is working correctly!\n");
         exit.write(AppExit::Success);

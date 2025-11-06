@@ -102,7 +102,7 @@ fn startup(mut commands: Commands, studio: Res<FmodStudio>) {
     });
 
     // Add camera for UI rendering
-    commands.spawn(Camera2d::default());
+    commands.spawn(Camera2d);
 }
 
 fn play_ambience(audio_sources: Query<&AudioSource>) {
